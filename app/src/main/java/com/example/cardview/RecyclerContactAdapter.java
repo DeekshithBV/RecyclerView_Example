@@ -6,7 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,11 +23,13 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContactAdapter.ViewHolder> {
-
     Context mContext;
     ArrayList<ContactModel> arrContacts;
+
+    public List<Integer> selectedPositions = new ArrayList<>();
     RecyclerContactAdapter(Context context, ArrayList<ContactModel> arrContacts){
         this.mContext=context;
         this.arrContacts=arrContacts;
@@ -33,7 +39,6 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.contact_row,parent,false);
-//        ViewHolder viewHolder = new ViewHolder(view);
         return new ViewHolder(view);
     }
     int globalPosition;
@@ -45,10 +50,19 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
 
         if(position==globalPosition) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.black));
+
         }
         else {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, android.R.color.transparent));
         }
+
+        if (selectedPositions.contains(position)){
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.black));
+        }
+        else {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, android.R.color.transparent));
+        }
+
     }
 
     @Override
@@ -56,6 +70,16 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
         return arrContacts.size();
     }
 
+    private void toggleSelection(int position){
+        if (selectedPositions.contains(position)){
+            selectedPositions.remove(Integer.valueOf(position));
+        }
+        else {
+            selectedPositions.add(position);
+        }
+        notifyDataSetChanged();
+        updateItemCount();
+    }
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView txtName, txtNumber;
         ImageView imgContact;
@@ -89,6 +113,11 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
                 }
             });
 
+            itemView.setOnLongClickListener(view -> {
+                int position = getAdapterPosition();
+                toggleSelection(position);
+                return false;
+            });
 
             button.setOnClickListener(v -> {
                 Intent intent = new Intent(mContext, SecondaryActivity.class);
@@ -105,12 +134,36 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
                 }
                 startActivity(mContext , intent , bundle);
             });
-
-
         }
-
-
 
     }
 
+    public void selectItem(int position) {
+        selectedPositions.add(position);
+        notifyItemChanged(position);
+        updateItemCount();
+    }
+
+    public void deselectItem(int position) {
+        selectedPositions.remove(Integer.valueOf(position));
+        notifyItemChanged(position);
+        updateItemCount();
+    }
+
+    public int getSelectedItemCount() {
+        return selectedPositions.size();
+    }
+
+    private void updateItemCount() {
+        // Call this method whenever the selected item count changes
+        if (mContext instanceof MainActivity) {
+            ((MainActivity) mContext).selItemCount.setText(String.valueOf(getSelectedItemCount()));
+        }
+    }
+
+    public void clearSelectedItems() {
+        selectedPositions.clear();
+        notifyDataSetChanged();
+        updateItemCount(); // Update count when items are cleared
+    }
 }

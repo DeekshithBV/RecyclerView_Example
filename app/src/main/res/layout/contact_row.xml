@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -48,9 +49,7 @@
                     android:layout_height="wrap_content"
                     android:text="Contact Number"
                     android:textSize="20sp" />
-
             </LinearLayout>
-
             <Button
                 android:id="@+id/buttonActivity"
                 android:layout_width="100dp"
@@ -59,5 +58,4 @@
                 android:text="Button" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
 </LinearLayout>
