@@ -30,9 +30,11 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
     ArrayList<ContactModel> arrContacts;
 
     public List<Integer> selectedPositions = new ArrayList<>();
-    RecyclerContactAdapter(Context context, ArrayList<ContactModel> arrContacts){
+    private SharedViewModel sharedViewModel;
+    RecyclerContactAdapter(Context context, ArrayList<ContactModel> arrContacts, SharedViewModel viewModel){
         this.mContext=context;
         this.arrContacts=arrContacts;
+        this.sharedViewModel = viewModel;
     }
 
     @NonNull
@@ -50,7 +52,6 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
 
         if(position==globalPosition) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.black));
-
         }
         else {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, android.R.color.transparent));
@@ -64,22 +65,48 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
         }
 
     }
-
     @Override
     public int getItemCount() {
         return arrContacts.size();
     }
 
-    private void toggleSelection(int position){
+    /*private void toggleSelection(int position){
         if (selectedPositions.contains(position)){
             selectedPositions.remove(Integer.valueOf(position));
         }
         else {
             selectedPositions.add(position);
+            if (mContext instanceof MainActivity) {
+                ((MainActivity) mContext).checkBoxSelectAll.setChecked(areAllItemsSelected());
+            }
+        }
+        notifyDataSetChanged();
+        updateItemCount();
+    }*/
+
+    private void toggleSelection(int position) {
+        if (selectedPositions.contains(position)) {
+//            selectedPositions.remove(Integer.valueOf(position));
+
+            if (mContext instanceof MainActivity) {
+                deselectItem(position);
+                if (mContext instanceof MainActivity) {
+                    ((MainActivity) mContext).checkBoxSelectAll.setChecked(false);
+                }
+            }
+
+        } else {
+            selectedPositions.add(position);
+            if (areAllItemsSelected()) {
+                if (mContext instanceof MainActivity) {
+                    ((MainActivity) mContext).checkBoxSelectAll.setChecked(true);
+                }
+            }
         }
         notifyDataSetChanged();
         updateItemCount();
     }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView txtName, txtNumber;
         ImageView imgContact;
@@ -104,19 +131,45 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
                 }
             });
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
+            /*itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                *//*@Override
                 public boolean onLongClick(View v) {
                     globalPosition=getAdapterPosition();
                     notifyDataSetChanged();
-                    return false;
+                    if (mContext instanceof MainActivity) {
+                        ((MainActivity) mContext).checkBoxSelectAll.setChecked(false);
+                    }
+                    return true;
+                }*//*
+
+                @Override
+                public boolean onLongClick(View v) {
+                    globalPosition = getAdapterPosition();
+
+                    // Check if the long-clicked item is already selected
+                    if (selectedPositions.contains(globalPosition)) {
+                        // Deselect only the long-clicked item
+                        deselectItem(globalPosition);
+                    } else {
+                        // Clear previous selections and select the long-clicked item
+                        clearSelectedItems();
+                        selectItem(globalPosition);
+                    }
+
+                    notifyDataSetChanged();
+
+                    // Uncheck the checkbox if any item is deselected after a long click
+                    if (mContext instanceof MainActivity) {
+                        ((MainActivity) mContext).checkBoxSelectAll.setChecked(false);
+                    }
+                    return true;
                 }
-            });
+            });*/
 
             itemView.setOnLongClickListener(view -> {
                 int position = getAdapterPosition();
                 toggleSelection(position);
-                return false;
+                return true;
             });
 
             button.setOnClickListener(v -> {
@@ -135,7 +188,6 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
                 startActivity(mContext , intent , bundle);
             });
         }
-
     }
 
     public void selectItem(int position) {
@@ -159,6 +211,10 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
         if (mContext instanceof MainActivity) {
             ((MainActivity) mContext).selItemCount.setText(String.valueOf(getSelectedItemCount()));
         }
+    }
+
+    public boolean areAllItemsSelected() {
+        return selectedPositions.size() == arrContacts.size();
     }
 
     public void clearSelectedItems() {
