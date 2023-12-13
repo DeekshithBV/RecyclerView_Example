@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("lifecycle", "MainActivity onCreate: ");
         setContentView(R.layout.activity_main);
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
-        Log.d("lifecycle", "onResume: ");
         RecyclerView recyclerView = findViewById(R.id.recyclerContact);
         checkBoxSelectAll = findViewById(R.id.checkBoxSelectAll);
         selItemCount = findViewById(R.id.selectedItemCount);
@@ -137,5 +136,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("lifecycle", "MainActivity onDestroy: ");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("lifecycle", "MainActivity onStop: ");
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d("lifecycle", "MainActivity onSaveInstanceState: ");
     }
 }
