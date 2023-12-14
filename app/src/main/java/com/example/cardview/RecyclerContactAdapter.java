@@ -2,15 +2,12 @@ package com.example.cardview;
 
 import static androidx.core.content.ContextCompat.startActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -70,20 +67,7 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
         return arrContacts.size();
     }
 
-    /*private void toggleSelection(int position){
-        if (selectedPositions.contains(position)){
-            selectedPositions.remove(Integer.valueOf(position));
-        }
-        else {
-            selectedPositions.add(position);
-            if (mContext instanceof MainActivity) {
-                ((MainActivity) mContext).checkBoxSelectAll.setChecked(areAllItemsSelected());
-            }
-        }
-        notifyDataSetChanged();
-        updateItemCount();
-    }*/
-
+    @SuppressLint("NotifyDataSetChanged")
     private void toggleSelection(int position) {
         if (selectedPositions.contains(position)) {
 //            selectedPositions.remove(Integer.valueOf(position));
@@ -131,41 +115,6 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
                 }
             });
 
-            /*itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                *//*@Override
-                public boolean onLongClick(View v) {
-                    globalPosition=getAdapterPosition();
-                    notifyDataSetChanged();
-                    if (mContext instanceof MainActivity) {
-                        ((MainActivity) mContext).checkBoxSelectAll.setChecked(false);
-                    }
-                    return true;
-                }*//*
-
-                @Override
-                public boolean onLongClick(View v) {
-                    globalPosition = getAdapterPosition();
-
-                    // Check if the long-clicked item is already selected
-                    if (selectedPositions.contains(globalPosition)) {
-                        // Deselect only the long-clicked item
-                        deselectItem(globalPosition);
-                    } else {
-                        // Clear previous selections and select the long-clicked item
-                        clearSelectedItems();
-                        selectItem(globalPosition);
-                    }
-
-                    notifyDataSetChanged();
-
-                    // Uncheck the checkbox if any item is deselected after a long click
-                    if (mContext instanceof MainActivity) {
-                        ((MainActivity) mContext).checkBoxSelectAll.setChecked(false);
-                    }
-                    return true;
-                }
-            });*/
-
             itemView.setOnLongClickListener(view -> {
                 int position = getAdapterPosition();
                 toggleSelection(position);
@@ -180,7 +129,7 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
                     ContactModel clickedContact = arrContacts.get(position);
                     String message = clickedContact.name;
                     String number = clickedContact.number;
-                    Log.e("Deek", "ViewHolder: " + message);
+                    Log.e("this", "ViewHolder: " + message);
                     bundle.putString("Name",message);
                     bundle.putString("Number",number);
                     intent.putExtras(bundle);
@@ -217,6 +166,7 @@ public class RecyclerContactAdapter extends RecyclerView.Adapter<RecyclerContact
         return selectedPositions.size() == arrContacts.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void clearSelectedItems() {
         selectedPositions.clear();
         notifyDataSetChanged();
